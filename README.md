@@ -26,6 +26,7 @@ what’s in the development pipeline?
         - BOBs can search for LISTINGs by category, file type, etc
         - ALICEs can post LISTING info, thumbnails, artwork, etc
         - BOBs can leave reviews/ratings
+        - clicking on a LISTING takes you to BOB's page where you are prompted to make a BID
     - js improvements (error checking, efficiency, etc)
     - ALICE and BOB pages to both be static pages on ipfs
 - protocol:
@@ -105,10 +106,10 @@ In the MetaMask browser extension:
 
 Now you should be ready to go!
 
-First, you'll have to run the 'setup' command and input the 'Test' smart contract address.
+First thing to do when you get ALICE's page loaded is to run the 'setup' command and input the 'Test' smart contract address.
 (Do the same when you get to Bob's page)
 
-And the rest should be easy enough to follow! 
+And the rest should be easy enough to follow! To simulate trading DKEYs and inputting multiple BIDs, you can load multiple BOB pages (all on http://localhost:8082/) -- and set up each with a different wallet address taken from your local blockchain.
 
 ...
 
