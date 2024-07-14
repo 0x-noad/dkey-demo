@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+  
+<html>
+  <head>
+    <script src="snarkjs.min.js"></script>
+    <script src="./bootstrap.js"></script>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DKEY | Alice</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="style.css" />
+    <link rel="icon" type="image/x-icon" href="key.png" />
+  </head>
+  <body>
+    <div id="terminal">
+      <a id="before"></a>
+    </div>
+    <div id="command" onclick="$('texter').focus();">
+      <textarea
+        type="text"
+        id="texter"
+        onkeyup="typeIt(this, event)"
+        onkeydown="typeIt(this, event); 
+                   moveIt(this.value.length, event)"
+        onkeypress="typeIt(this, event);"
+        autofocus
+      ></textarea>
+      <div id="liner">
+        <span id="typer"></span><b class="cursor" id="cursor">█</b>
+      </div>
+    </div>
+    <div class="fullscreen-dropzone" id="dropzone"></div>
+    <script>
+        // style/functions stolen from https://fkcodes.com/
+        function $(elid) {
+            return document.getElementById(elid);
+        }
+        
+        var cursor;
+        window.onload = init;
+
+        function init() {
+        cursor = $("cursor");
+        cursor.style.left = "0px";
+        }
+
+        function nl2br(txt) {
+        return txt.replace(/\n/g, '');
+        }
+
+        function typeIt(from, e) {
+        e = e || window.event;
+        var w = $("typer");
+        var tw = from.value;
+        if (!pw){
+            w.innerHTML = nl2br(tw);
+        }
+        }
+
+        function moveIt(count, e) {
+        e = e || window.event;
+        var keycode = e.keyCode || e.which;
+        if (keycode == 37 && parseInt(cursor.style.left) >= (0 - ((count - 1) * 10))) {
+            cursor.style.left = parseInt(cursor.style.left) - 10 + "px";
+        } else if (keycode == 39 && (parseInt(cursor.style.left) + 10) <= 0) {
+            cursor.style.left = parseInt(cursor.style.left) + 10 + "px";
+        }
+        }
+
+        function alert(txt) {
+        console.log(txt);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        var twitter = "https://x.com/0x_noad";
+        var github = "https://github.com/0x-noad/";
+        var githubUsage = "https://github.com/0x-noad/dkey-demo?tab=readme-ov-file#usage"
+        var email = 'brandnewdev@proton.me';
+
+        info = [
+        "<br>",
+        "Welcome to the DKEY web app explainer! First, some terms...",
+        "<br>",
+        '<span class="index">DKEY</span>                A decryption key that gives access to an ENCRYPTED FILE.',
+        '<span class="index">ENCRYPTED FILE</span>      The encrypted file that ALICE wishes to sell access to.',
+        '<span class="index">ALICE</span>               The file owner & seller.',
+        '<span class="index">BOB</span>                 Someone looking to access the file -- by submitting a BID &',
+        '                    purchasing a DKEY.',
+        '<span class="index">LISTING</span>             Created by ALICE; contains all the data necessary',
+        '                    for ALICEs & BOBs to transact. i.e.:',
+        "                       -  the IPFS CID of the ENCRYPTED FILE",
+        "                       -  how many DKEYs are for sale",
+        "                       -  how many DKEYs have been sold",
+        "                       -  a DKEY's minimum sale price",
+        "                       -  ALICE's royalty (%) on all future sales of a DKEY",
+        "                       -  ALICE's blockchain address",
+        "                       -  which BOBs have submitted BIDs (and their respective values)",
+        "                       -  which BOBs own DKEYs",
+        "                       -  a hash of the secret key ALICE uses to create DKEYs",
+        '<span class="index">SMART CONTRACT</span>      Exists on the blockchain, contains the LISTING data &',
+        '                    executes the logic necessary for all DKEY transactions.',
+        '<span class="index">BID</span>                 A payment made by a BOB to the LISTING. The BID is',
+        '                    held by the SMART CONTRACT in escrow until ALICE',
+        '                    responds with a valid DKEY.',
+        '<span class="index">IPFS CID</span>            IPFS is a peer-to-peer file sharing network where content is',
+        '                    addressed by its hash -- a.k.a., Content Identifier (CID).',
+        "<br>",
+        "This webpage is where you -- an ALICE -- can perform all of the functions necessary to",
+        "begin selling DKEYs. Here, you'll be able to:",
+        '  - encrypt your file',
+        '  - share your ENCRYPTED FILE on IPFS',
+        '  - create a LISTING',
+        '  - safely store a copy of your secret key',
+        '  - share a link where BOBs can submit BIDs',
+        "  - check if any BOBs have made BIDs",
+        "  - respond to BOBs' BIDs with DKEYs",
+        "<br>",
+        'To get started, type <span class="command">\'start\'</span>.',
+        "<br>",
+        ];
+
+        social = [
+        "<br>",
+        'twitter        <a href="' + twitter + '" target="_blank">twitter/0x_noad' + '</a>',
+        'github         <a href="' + github + '" target="_blank">github/0x-noad' + "</a>",
+        "<br>"
+        ];
+
+        help = [
+        "<br>",
+        '<span class="command">info</span>           Provides an explanation of the app',
+        '<span class="command">start</span>          Start using the DKEY web app',
+        '<span class="command">history</span>        View command history',
+        '<span class="command">clear</span>          Clear terminal',
+        '<span class="command">banner</span>         Display the header',
+        '<span class="command">social</span>         Display Noad\'s social networks',
+        '<span class="command">email</span>          Get in touch with Noad',
+        '<span class="command">thanks</span>         Some individuals/orgs Noad would like to thank',
+        "<br>",
+        ];
+
+        banner = [
+        '<span class="index">~~~DKEY~~~                a Noad™ production. 2024. </span>',
+        "           __  __                            _   ",
+        "          /\\ \\/\\ \\                          (D) ",
+        "          \\_\\ \\ \\ \\/'\\      __   __  __      T   ",
+        "          /'_` \\ \\ , <    /'__`\\/\\ \\/\\ \\     |   ",
+        "  \\0~    /\\ \\L\\ \\ \\ \\\\`\\ /\\  __/\\ \\ \\_\\ \\    |K      ",
+        "   A\\    \\ \\___,_\\ \\_\\ \\_\\ \\____\\\\/`____ \\         ",
+        "   ‖      \\/__,_ /\\/_/\\/_/\\/____/ `/___/> \\       ",
+        "                                     /\\___/          ",
+        "                                     \\/__/          ",
+        '<span class="color2">Welcome to the DKEY web app demo!</span>',
+        "<span class=\"color2\"> <span class=\"index\">***</span> Before getting started, type <span class=\"command\">'setup'</span> <span class=\"index\">***</span></span>",
+        "<span class=\"color2\"> Then, to create a LISTING for your file, type <span class=\"command\">'start'</span></span>",
+        "<span class=\"color2\"> To check if BIDs have been submitted to your LISTING, type <span class=\"command\">'check'</span></span>",
+        "<span class=\"color2\">For a quick rundown of the app (incl. terminology), type</span> <span class=\"command\">'info'</span>",
+        "<span class=\"color2\">For a list of all available commands, type</span> <span class=\"command\">'help'</span>",
+        ];
+
+        congrats = [
+        "<br>",
+        '   _\\/_                                       _\\/_',
+        '   /o\\\\                                       //o\\ ',
+        '    |                      |                    |',
+        '    |     \\0~          \\       /                |   ',
+        '    |      A\\            .---.                  |',
+        '   _|______‖___     --  /     \\  --     ________|__',
+        '               `~^~^~^~^~^~^~^~^~^~^~^~`',
+        "<br>"
+        ];
+
+        dkeyProvidedAscii = [
+        '                                    _             ',
+        '                                   (D)            ',
+        '   0~                               T     0    ',
+        "  /A¯¯   ``'-.,_,.-'``'-.,_,.='``   |     >\\    ",
+        '   ‖                                |K     ‖    ',
+        "<br>"
+        ];
+
+        thanks = [
+        "<br>",
+        "Hardly an exhaustive list -- but a huge thanks to some great resources/people/teams",
+        "without whom 'DKEY' would never have been possible.",
+        '• <a href="https://github.com/iden3/circom" target="_blank">circom/iden3' + '</a>',
+        '• <a href="https://agregore.mauve.moe/" target="_blank">agregore/Mauve' + '</a>',
+        '• <a href="https://github.com/Shigoto-dev19/ec-elgamal-circom/tree/ElGamal-Scheme-%2B-Decoding" target="_blank">ec-elgamal-circom/Shigoto-dev19' + '</a>',
+        '• <a href="https://github.com/meixler/web-browser-based-file-encryption-decryption/tree/ec55f1fa9c8c02d8a8048777f67ca77021b9a207" target="_blank">web-browser-based-file-encryption-decryption/meixler' + '</a>',
+        '• <a href="https://fkcodes.com/" target="_blank">terminal-website/ForrestKnight' + '</a>',
+        "Apologies for hacking together pieces of your code in such an unseemly fashion... <3",
+        "<br>",
+        ]
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        var before = document.getElementById("before");
+        var liner = document.getElementById("liner");
+        var command = document.getElementById("typer"); 
+        var textarea = document.getElementById("texter"); 
+        var terminal = document.getElementById("terminal");
+
+        var git = 0;
+        var inputHowManyDKeys = false;
+        var inputDKeySalePrice = false;
+        var inputRoyaltyAmount = false;
+        var enterJsonEncryptPassword = false;
+        var reenterJsonEncryptPassword = false;
+        var enterJsonDecryptPassword = false;
+        var respondToBidsPrompt = false;
+        var useUpdatedJson = false;
+        var enterTestContractAddress = false;
+        let pw = false;
+        let pwd = false;
+        var commands = [];
+
+        var dkeyPrice = null;
+        window.dkeyPrice = dkeyPrice;
+        var royaltyPercentage = null;
+        window.royaltyPercentage = royaltyPercentage;
+        var howManyDKeysForSale = null;
+        window.howManyDKeysForSale = howManyDKeysForSale;
+        var jsonStr = null;
+        window.jsonStr = jsonStr;
+        var jsonPassword = null;
+        window.jsonPassword = jsonPassword;
+        var jsonDragAndDrop = null;
+        window.jsonDragAndDrop = jsonDragAndDrop;
+        var encryptedListingDataJson = null;
+        window.encryptedListingDataJson = encryptedListingDataJson;
+        var jsonDecryptPassword = null;
+        window.jsonDecryptPassword = jsonDecryptPassword;
+        var updatedListingDataJson = null;
+        window.updatedListingDataJson = updatedListingDataJson;
+
+        var testContractAddress = null;
+        window.testContractAddress = testContractAddress;
+
+        var secret_key_x_1 = null;
+        var secret_key_y_1 = null;
+        window.secret_key_x_1 = secret_key_x_1
+        window.secret_key_y_1 = secret_key_y_1
+
+
+        setTimeout(function() {
+        loopLines(banner, "", 80);
+        textarea.focus();
+        }, 100);
+
+        window.addEventListener("keyup", enterKey);
+
+        //init
+        textarea.value = "";
+        command.innerHTML = textarea.value;
+
+        function enterKey(e) {
+        if (inputHowManyDKeys) {
+            if (command.innerHTML.length > 0 && e.keyCode == 13) {
+            addLine("<span class=\"color2\"># of DKEYs for sale: </span>" + command.innerHTML, "index", 20);
+            howManyDKeysForSale = command.innerHTML;
+            command.innerHTML = "";
+            textarea.value = "";
+            inputHowManyDKeys = false;
+            inputDKeySalePrice = true;
+            liner.classList.remove("howManyDkeysForSale");
+            liner.classList.add("dkeySalePriceEth");
+            }
+        } 
+        else if (inputDKeySalePrice) {
+            if (command.innerHTML.length > 0 && e.keyCode == 13) {
+            addLine("<span class=\"color2\">DKEY price: </span>" + command.innerHTML + " ETH", "index", 20);
+            dkeyPrice = command.innerHTML;
+            command.innerHTML = "";
+            textarea.value = "";
+            inputDKeySalePrice = false;
+            inputRoyaltyAmount = true;
+            liner.classList.remove("dkeySalePriceEth");
+            liner.classList.add("royaltyAmountPercentage");
+            }
+        } 
+        else if (inputRoyaltyAmount) {
+            if (command.innerHTML.length > 0 && e.keyCode == 13) {
+            addLine("<span class=\"color2\">Royalty amount: </span>" + command.innerHTML + "%<br><br><span class=\"color2\">If the above is correct, type '<span class=\"command\">create</span>' -- or, type '<span class=\"command\">edit</span>' to make changes</span>", "index", 20);
+            royaltyPercentage = command.innerHTML;
+            command.innerHTML = "";
+            textarea.value = "";
+            inputRoyaltyAmount = false;
+            liner.classList.remove("royaltyAmountPercentage");
+            }
+        } 
+        else if (enterJsonEncryptPassword) {
+            if (command.innerHTML.length > 7 && e.keyCode == 13) {
+                jsonPassword = command.innerHTML;
+                command.innerHTML = "";
+                textarea.value = "";
+                enterJsonEncryptPassword = false;
+                reenterJsonEncryptPassword = true;
+                liner.classList.remove("enterJsonEncryptPassword");
+                liner.classList.add("reenterJsonEncryptPassword");
+            }
+        } 
+        else if (reenterJsonEncryptPassword) {
+            if (command.innerHTML.length > 7 && e.keyCode == 13) {
+                if (jsonPassword == command.innerHTML) {
+                    command.innerHTML = "";
+                    textarea.value = "";
+                    reenterJsonEncryptPassword = false;
+                    liner.classList.remove("reenterJsonEncryptPassword");
+                    if (!useUpdatedJson) {
+                        encryptJsonStringWithPassword(jsonStr, jsonPassword)
+                    } else {
+                        encryptJsonStringWithPassword(JSON.stringify(updatedListingDataJson, null, 2), jsonPassword)
+                        useUpdatedJson = false;
+                    }
+                } else {
+                    addLine("<br>Password does not match. Please re-enter password. To use a different password, instead type '<span class=\"command\">change</span>'.", "inherit", 80);
+                    command.innerHTML = "";
+                    textarea.value = ""; 
+                }
+            } else if (command.innerHTML == "change" && e.keyCode == 13) {
+                enterJsonEncryptPassword = true;
+                reenterJsonEncryptPassword = false;
+                command.innerHTML = "";
+                textarea.value = "";
+                liner.classList.remove("reenterJsonEncryptPassword");
+                liner.classList.add("enterJsonEncryptPassword");
+            }
+        } 
+        else if (enterJsonDecryptPassword) {
+            if (command.innerHTML.length > 7 && e.keyCode == 13) {
+                jsonDecryptPassword = command.innerHTML;
+                command.innerHTML = "";
+                textarea.value = "";
+                enterJsonDecryptPassword = false;
+                liner.classList.remove("enterJsonDecryptPassword");
+                addLine("<br>Decrypting the LISTING data...", "color2", 90);
+                decryptJsonStringWithPassword(encryptedListingDataJson, jsonDecryptPassword).then(json => {
+                    checkIfBidReceived(json);
+                });
+            }
+        } 
+        else if (enterTestContractAddress) {
+            if (command.innerHTML.length > 40 && e.keyCode == 13) {
+                testContractAddress = command.innerHTML;
+                command.innerHTML = "";
+                textarea.value = "";
+                enterTestContractAddress = false;
+                liner.classList.remove("enterTestContractAddress");
+                addLine("<br>Contract address updated to <span class=\"index\">" + testContractAddress + "</span><br>N.B.: Try to avoid reloading the page, as you'll have to input the contract address each time you do.<br>Now, you can enter in any of the commands above to get started!<br>", "color2", 40);
+            }
+        }
+        else {
+            if (e.keyCode == 13) {
+            commands.push(command.innerHTML);
+            git = commands.length;
+            addLine("user:~$ " + command.innerHTML, "no-animation", 0);
+            commander(command.innerHTML.toLowerCase());
+            command.innerHTML = "";
+            textarea.value = "";
+            }
+            if (e.keyCode == 38 && git != 0) {
+            git -= 1;
+            textarea.value = commands[git];
+            command.innerHTML = textarea.value;
+            }
+            if (e.keyCode == 40 && git != commands.length) {
+            git += 1;
+            if (commands[git] === undefined) {
+                textarea.value = "";
+            } else {
+                textarea.value = commands[git];
+            }
+            command.innerHTML = textarea.value;
+            }
+        }
+        }
+
+        function commander(cmd) {
+        switch (cmd.toLowerCase()) {
+            case "help":
+            loopLines(help, "color2 margin", 80);
+            break;
+            case "info":
+            loopLines(info, "color2 margin", 80);
+            break;
+            case "start":
+            jsonDragAndDrop = false;
+            addLine("Connect your Web3 wallet...", "color2", 80);
+            connectWallet();
+            break;
+            case "social":
+            loopLines(social, "color2 margin", 80);
+            break;
+            case "confirm":
+            addLine("<br>Fill out the following options for your LISTING, hitting <span class=\"command\">[ENTER]</span> to submit...<br>", "color2", 0);
+            liner.classList.add("howManyDkeysForSale");
+            inputHowManyDKeys = true;
+            break;
+            case "edit":
+            addLine("<br>Fill out the following options for your LISTING, hitting <span class=\"command\">[ENTER]</span> to submit...<br>", "color2", 0);
+            liner.classList.add("howManyDkeysForSale");
+            inputHowManyDKeys = true;
+            break;
+            case "create":
+            addLine("<br>Sign the transaction with your Web3 wallet to save your LISTING on the blockchain...<br>", "color2", 0);
+            createListing();
+            break;
+            case "history":
+            addLine("<br>", "", 0);
+            loopLines(commands, "color2", 80);
+            addLine("<br>", "command", 80 * commands.length + 50);
+            break;
+            case "email":
+            addLine('Opening mailto:<a href="mailto:brandnewdev@proton.me">brandnewdev@proton.me</a>...', "color2", 80);
+            newTab(email);
+            break;
+            case "clear":
+            setTimeout(function() {
+                terminal.innerHTML = '<a id="before"></a>';
+                before = document.getElementById("before");
+            }, 1);
+            break;
+            case "banner":
+            loopLines(banner, "", 80);
+            break;
+            case "thanks":
+            loopLines(thanks, "color2", 80);
+            break;
+            case "download":
+            addLine("<br>Enter a password to protect your updated LISTING data. Make sure to keep this password safe, as it <br>protects the secret key you will need later when creating DKEYs for BOBs. Password must be <br>at least 8 characters.", "color2", 160); 
+            enterJsonEncryptPassword = true;
+            useUpdatedJson = true;
+            liner.classList.add("enterJsonEncryptPassword");
+            break;
+            case "check":
+            jsonDragAndDrop = true;
+            addLine("Drag and drop your password-protected LISTING data anywhere on this page...<br>", "color2", 0);
+            break;
+            case "change":
+            enterJsonEncryptPassword = true;
+            reenterJsonEncryptPassword = false;
+            liner.classList.remove("reenterJsonEncryptPassword");
+            liner.classList.add("enterJsonEncryptPassword");
+            break;
+            case "setup":
+            enterTestContractAddress = true;
+            addLine('For an exhaustive run-down of how to set up a local blockchain, deploy the contracts, <br>get MetaMask set up, etc... click <a href="' + githubUsage + '" target="_blank">HERE</a>.', "color2", 10);
+            addLine("Once that's all done, enter the blockchain address of the Test.sol contract...", "color2", 40);
+            liner.classList.add("enterTestContractAddress");
+            break;
+            case "github":
+            addLine("Opening GitHub...", "color2", 0);
+            newTab(github);
+            break;
+            default:
+            addLine("<span class=\"inherit\">Command not found. For a list of commands, type <span class=\"command\">'help'</span>.</span>", "error", 100);
+            break;
+        }
+        }
+
+        function newTab(link) {
+        setTimeout(function() {
+            window.open(link, "_blank");
+        }, 500);
+        }
+
+        function addLine(text, style, time) {
+        var t = "";
+        for (let i = 0; i < text.length; i++) {
+            if (text.charAt(i) == " " && text.charAt(i + 1) == " ") {
+            t += "&nbsp;&nbsp;";
+            i++;
+            } else {
+            t += text.charAt(i);
+            }
+        }
+        setTimeout(function() {
+            var next = document.createElement("p");
+            next.innerHTML = t;
+            next.className = style;
+
+            before.parentNode.insertBefore(next, before);
+
+            window.scrollTo(0, document.body.offsetHeight);
+        }, time);
+        }
+
+        function loopLines(name, style, time) {
+        name.forEach(function(item, index) {
+            addLine(item, style, index * time);
+        });
+        }
+
+        function loopLinesPromise(name, style, time) {
+            return new Promise((resolve) => {
+                const promises = name.map((item, index) => addLinePromise(item, style, index * time));
+                Promise.all(promises).then(() => resolve());
+            });
+        }
+
+        function addLinePromise(text, style, time) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+            addLine(text, style, 0); 
+            resolve();
+            }, time);
+        });
+        }
+
+    </script>
+    <script>
+        // taken from https://github.com/meixler/web-browser-based-file-encryption-decryption/blob/ec55f1fa9c8c02d8a8048777f67ca77021b9a207/web-browser-based-file-encryption-decryption.html#L255 
+        var mode='encrypt';
+        var objFile=null;
+        var ipfsFileCID=null;
+        var fileType=null;
+
+        function readfile(file){
+            return new Promise((resolve, reject) => {
+                var fr = new FileReader();  
+                fr.onload = () => {
+                    resolve(fr.result )
+                };
+                fr.readAsArrayBuffer(file);
+            });
+        }
+
+        async function encryptfile() {
+            var plaintextbytes=await readfile(objFile)
+            .catch(function(err){
+                console.error(err);
+            });	
+            var plaintextbytes=new Uint8Array(plaintextbytes);
+
+            console.log(secret_key_x_1 + secret_key_y_1)
+
+            var pbkdf2iterations=10000;
+            var passphrasebytes=new TextEncoder("utf-8").encode(secret_key_x_1 + secret_key_y_1); // changed this
+            var pbkdf2salt=window.crypto.getRandomValues(new Uint8Array(8));
+
+            var passphrasekey=await window.crypto.subtle.importKey('raw', passphrasebytes, {name: 'PBKDF2'}, false, ['deriveBits'])
+            .catch(function(err){
+                console.error(err);
+            });
+            console.log('passphrasekey imported');
+
+            var pbkdf2bytes=await window.crypto.subtle.deriveBits({"name": 'PBKDF2', "salt": pbkdf2salt, "iterations": pbkdf2iterations, "hash": 'SHA-256'}, passphrasekey, 384)		
+            .catch(function(err){
+                console.error(err);
+            });
+            console.log('pbkdf2bytes derived');
+            pbkdf2bytes=new Uint8Array(pbkdf2bytes);
+
+            keybytes=pbkdf2bytes.slice(0,32);
+            ivbytes=pbkdf2bytes.slice(32);
+
+            var key=await window.crypto.subtle.importKey('raw', keybytes, {name: 'AES-CBC', length: 256}, false, ['encrypt']) 
+            .catch(function(err){
+                console.error(err);
+            });
+            console.log('key imported');		
+
+            var cipherbytes=await window.crypto.subtle.encrypt({name: "AES-CBC", iv: ivbytes}, key, plaintextbytes)
+            .catch(function(err){
+                console.error(err);
+            });
+
+            if(!cipherbytes) {
+                spnEncstatus.classList.add("redspan");
+                spnEncstatus.innerHTML='<p>Error encrypting file.  See console log.</p>';
+                return;
+            }
+
+            console.log('plaintext encrypted');
+            cipherbytes=new Uint8Array(cipherbytes);
+            console.log("cipherbytes:")
+            console.log(cipherbytes)
+
+            var resultbytes=new Uint8Array(cipherbytes.length+16)
+            resultbytes.set(new TextEncoder("utf-8").encode('Salted__'));
+            resultbytes.set(pbkdf2salt, 8);
+            resultbytes.set(cipherbytes, 16);
+
+
+            var blob=new Blob([resultbytes], {type: 'application/download'});
+
+            const arrayBuffer = await blob.arrayBuffer();
+            const byteArray = new Uint8Array(arrayBuffer);
+            console.log('Blob byte content:', byteArray);
+            
+            var blobUrl=URL.createObjectURL(blob);
+
+            // write file type to variable
+            fileType = objFile.name.split(".")
+            fileType = fileType[1]
+            console.log(fileType)
+
+            // upload file to IPFS (taken from https://github.com/AgregoreWeb/agregore-drag-and-drop/blob/main/index.html)
+            
+            const formData = new FormData();
+            formData.append('file', blob, objFile.name);
+
+            try {
+                const response = await fetch(`ipfs://bafyaabakaieac/`, {
+                    method: 'PUT',
+                    body: formData,
+                });
+                if (!response.ok) {
+                    console.log('error uploading file to ipfs')
+                }
+                const urlResponse = response.headers.get('Location');
+                ipfsFileCID = urlResponse;
+                addLine('Encrypted file uploaded to IPFS at ' + ipfsFileCID + '<br><br>If this is the correct file, type \'<span class="command">confirm</span>\' to continue creating the <span class="index">LISTING</span>.<br>To use a different file, drag and drop the file you wish to use...', "color2", 80);
+            } catch (error) {
+                console.error(`Error uploading file`);
+            }
+        }
+        window.fileType = fileType;
+        window.ipfsFileCID = ipfsFileCID; 
+        window.encryptfile = encryptfile;
+    </script>
+  </body>
+</html>
+
+
+
+
