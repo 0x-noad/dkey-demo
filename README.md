@@ -80,14 +80,14 @@ From the terminal, grab the contract address that 'Test' is deployed to.
     - type `~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Extensions`
 Once you've found the MetaMask extension folder, drag and drop it into the Agregore extensions folder.
 
-Now, serve ALICE's website:
+Now, serve ALICE's page:
 ```bash
 $ npm install -g http-server
 $ cd dist-alice
 $ http-server
 ```
 
-Then, open up another terminal and serve BOB's website:
+Then, open up another terminal and serve BOB's page:
 ```bash
 $ cd ..
 $ cd dist-bob
