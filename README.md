@@ -103,6 +103,7 @@ In the MetaMask browser extension:
     - click on the Account drop down, then "+ Add account or hardware wallet", then "Import Account", and paste in the private key
 - manually connect MetaMask to the website (if it doesn't do so automatically):
     - click the three dots at the top right > "Connected sites" > "Manually connect to current site"
+    - (to make life easier, only connect ALICE's wallet to http://localhost:8081/ and BOB's to http://localhost:8082/)
 
 Now you should be ready to go!
 
