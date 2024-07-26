@@ -80,7 +80,7 @@ This web app currently requires Agregore Web Browser's built-in IPFS compatibili
 - open a Finder window
 - press `Command + Shift + G`
 - type `~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Extensions`
-Once you've found the folder that holds the MetaMask extension files, drag and drop it into the Agregore extensions folder.
+- once you've found the folder that holds the MetaMask extension files, drag and drop it into the Agregore extensions folder.
 
 
 Now, open up Agregore Browser and open up a window for both ALICE's and BOB's pages (https://0x-noad.github.io/alice/alice.html and https://0x-noad.github.io/bob/bob.html)
