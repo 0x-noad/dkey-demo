@@ -48,7 +48,7 @@ what’s in the development pipeline?
 
 ## Usage
 
-** This repo should be used as a demo only. Use the steps below to set up a local blockchain and see the smart contract & zkSNARKs work. N.B.: none of the smart contracts or proof circuits have been audited at this time. **
+** This repo should be used as a demo only. Use the steps below to set up a local blockchain and see the smart contract & zkSNARKs work with the front end (hosted at https://0x-noad.github.io/). N.B.: none of the smart contracts or proof circuits have been audited at this time. **
 
 ...
 
@@ -59,6 +59,7 @@ Open up terminal (Mac) or cmd (Windows) and navigate to the unzipped folder, ex:
 $ cd downloads
 $ cd dkey-main
 ```
+
 
 If you don't have them, download Ganache (https://trufflesuite.com/ganache/) and Node (https://nodejs.org/en/download).
 - Open Ganache and set up a new Workspace with:
@@ -72,29 +73,17 @@ $ npm install -g truffle
 $ truffle migrate
 ```
 
-From the terminal, grab the contract address that 'Test' is deployed to.
+From the terminal, grab the contract address that 'Test' is deployed to (this will also be accessible in the "Contracts" tab of your Ganache workspace).
 
-*This web app currently requires Agregore Web Browser's built-in IPFS compatibility (download it here https://github.com/AgregoreWeb/agregore-browser/releases/latest). You will have to download and install MetaMask's Chromium extension on Agregore (https://agregore.mauve.moe/docs/extensions). I found it was easiest to install the extension on Brave browser first (https://metamask.io/download/), then navigate to where Brave extensions are stored -- on Mac:
-    - open a Finder window
-    - press `Command + Shift + G`
-    - type `~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Extensions`
-Once you've found the MetaMask extension folder, drag and drop it into the Agregore extensions folder.
 
-Now, serve ALICE's page:
-```bash
-$ npm install -g http-server
-$ cd dist-alice
-$ http-server
-```
+This web app currently requires Agregore Web Browser's built-in IPFS compatibility (download it here https://github.com/AgregoreWeb/agregore-browser/releases/latest). You will have to download and install MetaMask's Chromium extension on Agregore (https://agregore.mauve.moe/docs/extensions). I found it was easiest to install the extension on Brave browser first (https://metamask.io/download/), then navigate to where Brave extensions are stored -- on Mac:
+- open a Finder window
+- press `Command + Shift + G`
+- type `~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Extensions`
+Once you've found the folder that holds the MetaMask extension files, drag and drop it into the Agregore extensions folder.
 
-Then, open up another terminal and serve BOB's page:
-```bash
-$ cd ..
-$ cd dist-bob
-$ http-server
-```
 
-Open up Agregore Browser and open 2 windows. Go to http://localhost:8081/ for ALICE's page, and http://localhost:8082/ for BOB's page (or whatever 'http-server' gives -- this assumes Ganache is already running on 8080).
+Now, open up Agregore Browser and open up a window for both ALICE's and BOB's pages (https://0x-noad.github.io/alice/alice.html and https://0x-noad.github.io/bob/bob.html)
 
 In the MetaMask browser extension: 
 - set up a new network by going to Settings > Networks > Add a network > Add a network manually (set it to match Ganache's RPC URL: HTTP://127.0.0.1:8080).
@@ -103,14 +92,14 @@ In the MetaMask browser extension:
     - click on the Account drop down, then "+ Add account or hardware wallet", then "Import Account", and paste in the private key
 - manually connect MetaMask to the website (if it doesn't do so automatically):
     - click the three dots at the top right > "Connected sites" > "Manually connect to current site"
-    - (to make life easier, only connect ALICE's wallet to http://localhost:8081/ and BOB's to http://localhost:8082/)
+    - (to make life easier, only connect ALICE's and BOB's wallets to their respective pages)
+
 
 Now you should be ready to go!
 
-First thing to do when you get ALICE's page loaded is to run the 'setup' command and input the 'Test' smart contract address.
-(Do the same when you get to Bob's page)
+First thing to do on each page is to run the 'setup' command and input the 'Test' smart contract address.
 
-And the rest should be easy enough to follow! To simulate trading DKEYs and inputting multiple BIDs, you can load multiple BOB pages (all on http://localhost:8082/) -- and set up each with a different wallet address taken from your local blockchain.
+And the rest should be easy enough to follow! To simulate trading DKEYs and inputting multiple BIDs, you can load multiple BOB pages and set up each with a different wallet address taken from your local blockchain.
 
 ...
 
