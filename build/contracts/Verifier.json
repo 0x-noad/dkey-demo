@@ -8016,12 +8016,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xBe2DEa3DCA73960c2dB63623B36595ED089d820A",
-      "transactionHash": "0xa6375a18613761c4c9d73d2974f7771d662b14aeea2a8711d0c9fd9dcf297375"
+      "address": "0x04155474b4C968f4F3470603526739F30537dbe5",
+      "transactionHash": "0x19d5ba455ea581511a1b5053afe4235480f39e585f5fb17355773721fd7e0dee"
     }
   },
   "schemaVersion": "3.4.11",
-  "updatedAt": "2024-07-11T03:44:16.412Z",
+  "updatedAt": "2024-07-23T17:28:03.902Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
