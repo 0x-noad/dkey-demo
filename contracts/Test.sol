@@ -21,10 +21,10 @@ contract Test {
 
     address payable owner = payable(0x79d78e89419839Ff45EED419B41E5c6b04F839c0); // just a random ganache address atm
 
-    event ListingCreated(bytes ipfsCid, string fileType, uint priceInEth, uint royaltyPercentage, bytes4 fileCategory, uint howManyDKeysForSale);
-    event PaymentReceived(bytes indexed ipfsCidIndexed, bytes ipfsCid, uint[2] bobDecryptingPubKey, address bobEthAddress, uint bobBidAmount, bool bobCanFillThisBid);
-    event ReencryptedKeyProvided(string fileType, bytes ipfsCid, uint indexed bobDecryptingPubKey, uint[4] dKey, uint bobDecryptingPubKeyX);
-    event BobsCanNowSellKeys(bytes indexed ipfsCidIndexed, bytes ipfsCid);
+    event ListingCreated(bytes ipfsCid, string fileType, uint priceInEth, uint royaltyPercentage, bytes4 fileCategory, uint howManyDKeysForSale); // can probably replace with view function
+    event BidReceived(bytes indexed ipfsCidIndexed, bytes ipfsCid, uint[2] bobDecryptingPubKey, address bobEthAddress, uint bobBidAmount, bool bobCanFillThisBid);
+    event DKeyProvided(string fileType, bytes ipfsCid, uint indexed bobDecryptingPubKey, uint[4] dKey, uint bobDecryptingPubKeyX);
+    event BobsCanNowSellKeys(bytes indexed ipfsCidIndexed, bytes ipfsCid); // can probably replace with view function
     event BidReclaimed(bytes indexed ipfsCid, uint bobDecryptingPubKeyX);
 
     mapping (bytes => Listing) public allListings;
@@ -57,17 +57,44 @@ contract Test {
         newListing.poseidonHashedSecretKey = _poseidonHashedSecretKey;
         newListing.aliceEthAddress = payable(msg.sender);
         existingListings[_ipfsCid] = true;
-        emit ListingCreated(_ipfsCid, _fileType, _priceInEth, _royaltyPercentage, _fileCategory, _howManyDKeysForSale);
+        emit ListingCreated(_ipfsCid, _fileType, _priceInEth, _royaltyPercentage, _fileCategory, _howManyDKeysForSale); // delete? will getListingDetails() work instead?
+    }
+
+    // are view functions better in production? or listening to event data?
+    function getListingDetails(bytes memory _ipfsCid) public view returns (
+        string memory fileType,
+        uint howManyDKeysForSale,
+        uint howManyDKeysSold,
+        uint priceInEth,
+        uint royaltyPercentage,
+        address payable aliceEthAddress,
+        bool bobsCanSellTheirDkeys
+    ) {
+        require(existingListings[_ipfsCid] == true, "listing does not exist"); // is this needed? or if i pass an _ipfsCid that doesn't exist, will it catch it some other way?
+        Listing storage thisListing = allListings[_ipfsCid];
+        return (
+            thisListing.fileType,
+            thisListing.howManyDKeysForSale,
+            thisListing.howManyDKeysSold,
+            thisListing.priceInEth,
+            thisListing.royaltyPercentage,
+            thisListing.aliceEthAddress,
+            thisListing.bobsCanSellTheirDkeys
+        );
     }
 
     function bobSendsPaymentToListing(bytes memory _ipfsCid, uint[2] memory _bobDecryptingPubKey) public payable {
         require(existingListings[_ipfsCid] == true, "listing does not exist");
         Listing storage thisListing = allListings[_ipfsCid];
-        require (msg.value > thisListing.priceInEth, "bids must be > alice's specified amount");
+        
+        if (!thisListing.bobsCanSellTheirDkeys) {
+        require(msg.value > thisListing.priceInEth, "bids must be > alice's specified amount (until alice has sold her specified # of keys)");
+        }
+
         require(allListings[_ipfsCid].bobsThatHavePaid[_bobDecryptingPubKey[0]] == false);
         require(allListings[_ipfsCid].bobsByEthAddress[uint256(uint160(address(msg.sender)))] == 0, "only 1 bid per address"); // do we want this? this currently makes it so that an eth address can only ever own 1 dkey per listing -- could change this by removing the address from the mapping in aliceSendsDKey()
         allListings[_ipfsCid].bobsThatHavePaid[_bobDecryptingPubKey[0]] = true;
-        emit PaymentReceived(_ipfsCid, _ipfsCid, _bobDecryptingPubKey, msg.sender, msg.value, allListings[_ipfsCid].bobsCanSellTheirDkeys);
+        emit BidReceived(_ipfsCid, _ipfsCid, _bobDecryptingPubKey, msg.sender, msg.value, allListings[_ipfsCid].bobsCanSellTheirDkeys);
         allListings[_ipfsCid].bobsByBidAmounts[_bobDecryptingPubKey[0]] = msg.value;
         allListings[_ipfsCid].bobsByEthAddress[uint256(uint160(address(msg.sender)))] = _bobDecryptingPubKey[0];
     }
@@ -87,7 +114,7 @@ contract Test {
         dKey[2] = _pubSignals[2];
         dKey[3] = _pubSignals[3];
 
-        // require poseidon hashed secret key in _pubSignals matches the Listing -- this should also serve to confirm if the listing exists (in case alice's frontend has called with incorrect _ipfsCid)
+        // require poseidon hashed secret key in _pubSignals matches the Listing
         require(_pubSignals[4] == allListings[_ipfsCid].poseidonHashedSecretKey);
         
         // ensure that this bob has not yet been provided a dkey ...... can this be exploited by alice creating a proof for bob's valid x value (_pubSignals[5]) but using a made up y value? (i dont think so -- should only be one valid y coord for a given x coord, and the proof circuit has a check that the point is on curve)
@@ -98,7 +125,7 @@ contract Test {
         require(result == true);
 
         // emit event so that Bob can listen for when the dkey is posted on-chain
-        emit ReencryptedKeyProvided(allListings[_ipfsCid].fileType, _ipfsCid, bobDecryptingPubKey[0], dKey, bobDecryptingPubKey[0]);
+        emit DKeyProvided(allListings[_ipfsCid].fileType, _ipfsCid, bobDecryptingPubKey[0], dKey, bobDecryptingPubKey[0]);
         
         // send 99% of bob's bid amount to alice, and send remainder to "owner" contract. is there going to be a small error (+/- some wei) in what the transfer amounts should be as a result of the division?
         uint256 bidAmount = allListings[_ipfsCid].bobsByBidAmounts[bobDecryptingPubKey[0]];
@@ -113,11 +140,18 @@ contract Test {
         // increment how many keys sold by 1
         allListings[_ipfsCid].howManyDKeysSold += 1;
 
-        // check to see if enough dkeys have been sold by alice that bobs can now sell dkeys, and update bool accordingly. also firing an event for bob's front end to know that he is now able to sell his dkey.
+        // check to see if enough dkeys have been sold by alice that bobs can now sell dkeys, and update bool accordingly. also firing an event for bob's front end to know that he is now able to sell his dkey... should this be a view function instead? would be much easier on bob's front end to just call a func (with the ipfsCid) to determine what the bool is
         if (allListings[_ipfsCid].howManyDKeysForSale - allListings[_ipfsCid].howManyDKeysSold == 0) {
             allListings[_ipfsCid].bobsCanSellTheirDkeys = true;
-            emit BobsCanNowSellKeys(_ipfsCid, _ipfsCid);
+            emit BobsCanNowSellKeys(_ipfsCid, _ipfsCid); // delete? will canBobsSellDkeys() work instead?
         }
+    }
+
+    // are view functions better in production? or listening to event data?
+    function canBobsSellDkeys(bytes memory _ipfsCid) public view returns (bool) {
+        require(existingListings[_ipfsCid] == true, "listing does not exist");
+        Listing storage thisListing = allListings[_ipfsCid];
+        return thisListing.bobsCanSellTheirDkeys;
     }
     
     // whole lotta "bob" getting thrown around here... this is 1 bob responding with a dkey to another bob's bid...
@@ -141,7 +175,7 @@ contract Test {
         bool result = zkVerifier.verifyProof(_pA, _pB, _pC, _pubSignals);
         require(result == true, "verification of zk proof failed");
 
-        emit ReencryptedKeyProvided(allListings[_ipfsCid].fileType, _ipfsCid, bobDecryptingPubKey[0], dKey, bobDecryptingPubKey[0]);
+        emit DKeyProvided(allListings[_ipfsCid].fileType, _ipfsCid, bobDecryptingPubKey[0], dKey, bobDecryptingPubKey[0]);
         
         uint256 bidAmount = allListings[_ipfsCid].bobsByBidAmounts[bobDecryptingPubKey[0]];
         uint256 royaltyAmount = allListings[_ipfsCid].royaltyPercentage;
@@ -155,7 +189,7 @@ contract Test {
 
         allListings[_ipfsCid].bobsThatHaveBeenProvidedDKeys[bobDecryptingPubKey[0]] = true;
 
-        // not needed, but leaving this cuz how many times a key changes hands could still be interesting... maybe for a "listing leaderboard"?
+        // not needed, but leaving this cuz how many times a key changes hands could still be interesting... e.g. a "listing leaderboard"
         allListings[_ipfsCid].howManyDKeysSold += 1;
     }
 
