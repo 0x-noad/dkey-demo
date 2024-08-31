@@ -105,6 +105,7 @@ Big thanks to:
 - https://github.com/Shigoto-dev19/ec-elgamal-circom
 - https://agregore.mauve.moe/
 - circom/snarkjs
+- https://github.com/Roger-Wu/erc1726-dividend-paying-token
 
 (for all the packages/pieces of code I've borrowed).
 
