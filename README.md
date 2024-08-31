@@ -1,4 +1,4 @@
-## About
+# About
 
 what is the DKEY protocol?
 - a DKEY is a Decryption KEY that an ALICE creates for a paying BOB, that allows access to a specified ENCRYPTED FILE.
@@ -34,19 +34,17 @@ what’s in the development pipeline?
         - byte packing, don’t need to save variables to memory in functions, other things I've missed...
     - auditing
         - smart contracts
-        - cryptography (confirm zk circuit & el gamal are implemented correctly)
+        - cryptography (confirm zk circuit, aes encryption & el gamal are implemented correctly)
         - front end (finalize production frontend)
     - scale/improve UX
         - use a subgraph (or Infura API?) to query event data
         - give option to use local IPFS node *or* an API for uploading/pinning/retrieval
     - $DKEY ERC20 token + fee distribution mechanism
-        - create token contract
-            - accumulated fees to be issued to token holders
-            - governance
-                - token holders can vote on proposals (protocol changes, “official” frontends, etc)
-                - a portion of the accumulated fees to go to further protocol development
+        - governance
+            - token holders can vote on proposals (protocol changes, “official” frontends, etc)
+            - a portion of the accumulated fees to go to further protocol development
 
-## Usage
+# Usage
 
 ** This repo should be used as a demo only. Use the steps below to set up a local blockchain and see the smart contract & zkSNARKs work with the front end (hosted at https://0x-noad.github.io/). N.B.: none of the smart contracts or proof circuits have been audited at this time. **
 
@@ -60,35 +58,34 @@ $ cd downloads
 $ cd dkey-main
 ```
 
+If you don't have it, download Node (https://nodejs.org/en/download).
 
-If you don't have them, download Ganache (https://trufflesuite.com/ganache/) and Node (https://nodejs.org/en/download).
-- Open Ganache and set up a new Workspace with:
-    - NETWORK ID: 5777
-    - PORT: 8080
-    - under "TRUFFLE PROJECTS", link to the truffle-config.js file
-
-Use truffle to deploy contracts:
+Use Hardhat to get a blockchain running locally:
 ```bash
-$ npm install -g truffle
-$ truffle migrate
+$ npm install hardhat
+$ npx hardhat node
 ```
 
-From the terminal, grab the contract address that 'Test' is deployed to (this will also be accessible in the "Contracts" tab of your Ganache workspace).
+Then, in a second terminal window, deploy the contracts:
+```bash
+$ npx hardhat ignition deploy ./ignition/modules/TestModule.js --network localhost
+```
 
+From the terminal, grab the contract address that 'Test.sol' is deployed to.
 
-This web app currently requires Agregore Web Browser's built-in IPFS compatibility (download it here https://github.com/AgregoreWeb/agregore-browser/releases/latest). You will have to download and install MetaMask's Chromium extension on Agregore (https://agregore.mauve.moe/docs/extensions). I found it was easiest to install the extension on Brave browser first (https://metamask.io/download/), then navigate to where Brave extensions are stored -- on Mac:
-- open a Finder window
-- press `Command + Shift + G`
-- type `~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Extensions`
-- once you've found the folder that holds the MetaMask extension files, drag and drop it into the Agregore extensions folder.
+> This web app currently requires Agregore Web Browser's built-in IPFS compatibility (download it here https://github.com/AgregoreWeb/agregore-browser/releases/ latest). You will have to download and install MetaMask's Chromium extension on Agregore (https://agregore.mauve.moe/docs/extensions). I found it was easiest to install the extension on Brave browser first (https://metamask.io/download/), then navigate to where Brave extensions are stored -- on Mac:
+> - open a Finder window
+> - press `Command + Shift + G`
+> - type `~/Library/Application Support/BraveSoftware/Brave-Browser/Default/Extensions`
+> Once you've found the folder that holds the MetaMask extension files, drag and drop it into the Agregore extensions folder.
 
 
 Now, open up Agregore Browser and open up a window for both ALICE's and BOB's pages (https://0x-noad.github.io/alice/alice.html and https://0x-noad.github.io/bob/bob.html)
 
 In the MetaMask browser extension: 
-- set up a new network by going to Settings > Networks > Add a network > Add a network manually (set it to match Ganache's RPC URL: HTTP://127.0.0.1:8080).
+- set up a new network by going to Settings > Networks > Add a network > Add a network manually (set it to match Hardhat's localhost: HTTP://127.0.0.1:8545).
 - create two new Metamask Accounts (one for ALICE and one for BOB): 
-    - grab the private keys for each of the top two addresses under the "ACCOUNTS" tab in the Ganache Workspace (click on the key icon on the right, copy the private key)
+    - grab the private keys for each of the top two addresses that Hardhat output to the terminal
     - click on the Account drop down, then "+ Add account or hardware wallet", then "Import Account", and paste in the private key
 - manually connect MetaMask to the website (if it doesn't do so automatically):
     - click the three dots at the top right > "Connected sites" > "Manually connect to current site"
@@ -97,7 +94,7 @@ In the MetaMask browser extension:
 
 Now you should be ready to go!
 
-First thing to do on each page is to run the 'setup' command and input the 'Test' smart contract address.
+First thing to do on each page is to run the 'setup' command and input the 'Test.sol' smart contract address. During 'setup' on the Token page (https://0x-noad.github.io/token/token.html), input the 'DividendPayingToken.sol' smart contract address. 
 
 And the rest should be easy enough to follow! To simulate trading DKEYs and inputting multiple BIDs, you can load multiple BOB pages and set up each with a different wallet address taken from your local blockchain.
 
